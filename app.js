@@ -355,7 +355,7 @@
     const blob = new Blob([JSON.stringify(sites.map(({ name, url, quick }) => quick ? { name, url, quick } : { name, url }), null, 2)], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "football-arena-sites.json";
+    link.download = "kickoff-sites.json";
     link.click();
     URL.revokeObjectURL(link.href);
   });
@@ -374,7 +374,7 @@
       });
       render();
       $("#status").textContent = "Site list imported.";
-    } catch { alert("That file isn’t a valid Football Arena sites list."); }
+    } catch { alert("That file isn’t a valid Kickoff sites list."); }
     event.target.value = "";
   });
 
