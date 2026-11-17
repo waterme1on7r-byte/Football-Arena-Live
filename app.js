@@ -267,12 +267,16 @@
       const go = document.createElement("button");
       go.type = "button";
       go.className = "quick-open";
-      go.append(avatar(site.name), document.createTextNode(" "));
+      go.append(avatar(site.name));
+      const copy = document.createElement("span");
+      copy.className = "quick-copy";
       const label = document.createElement("span");
+      label.className = "quick-name";
       label.textContent = site.name;
       const small = document.createElement("small");
       small.textContent = site.url;
-      go.append(label, small);
+      copy.append(label, small);
+      go.append(copy);
       go.addEventListener("click", () => togglePane(site.id));
       const opt = button("⋮", "more", "Options for " + site.name, event => {
         event.stopPropagation(); showMenu(opt, site);
