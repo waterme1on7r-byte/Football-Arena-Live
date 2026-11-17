@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0f14">
+<title>Football Arena</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cellipse cx='24' cy='24' rx='22' ry='17' fill='%230b0f14' stroke='%23f5c451' stroke-width='3'/%3E%3Ccircle cx='24' cy='24' r='5' fill='none' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&display=swap">
+<style>
+:root{--bg:#0b0f14;--panel:#121923;--line:#223042;--text:#e9edf2;--mute:#8696a8;--gold:#f5c451;--gold2:#ffe39a;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;overflow:hidden;background-image:radial-gradient(900px 260px at 12% -80px,rgba(245,196,81,.12),transparent 70%)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 14px;transition:border-color .15s,background .15s}
+button:hover{border-color:#3a5068}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+header{position:relative;display:flex;align-items:center;gap:20px;padding:14px 22px 18px;flex-wrap:wrap}
+header::after{content:"";position:absolute;left:22px;right:22px;bottom:0;height:1px;background:linear-gradient(90deg,var(--gold),var(--line) 35%,var(--line))}
+.brand{display:flex;align-items:center;gap:14px;margin-right:auto}
+.brand svg{width:56px;height:56px;flex:none;filter:drop-shadow(0 0 14px rgba(245,196,81,.35))}
+.brand h1{margin:0;font:900 clamp(34px,5.2vw,58px)/.9 "Big Shoulders Display",Impact,"Arial Narrow",sans-serif;letter-spacing:.03em;background:linear-gradient(95deg,var(--gold2),var(--gold) 55%,#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;border-radius:0;background:transparent;padding:8px 12px;color:var(--mute)}
+.seg button[aria-pressed=true]{background:var(--gold);color:#1a1405;font-weight:600}
+.primary{background:var(--gold);color:#1a1405;border-color:var(--gold);font-weight:600}
+.primary:hover{background:var(--gold2);border-color:var(--gold2)}
+nav{display:flex;gap:8px;padding:14px 22px 12px;overflow-x:auto;scrollbar-width:thin;min-height:44px}
+.chip{display:flex;align-items:center;flex:none;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.chip[aria-current=true]{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.chip button{border:0;background:transparent;border-radius:999px;padding:7px 6px 7px 14px}
+.chip .x,.chip .opt{padding:7px 9px;color:var(--mute)}
+.chip .opt{padding-right:12px;font-weight:700}
+.chip{touch-action:pan-x;user-select:none}
+.chip.drag{border-color:var(--gold);transform:scale(1.06);box-shadow:0 8px 22px rgba(0,0,0,.55);z-index:2;cursor:grabbing}
+.chip .x:hover{color:#ff7b7b}
+.chip.tmp{background:var(--gold);border-color:var(--gold)}
+.chip.tmp .opt{color:#5a4710}.chip.tmp .opt:hover{color:#1a1405}
+.pane.flash{animation:fl 1s ease-out}
+@keyframes fl{0%{box-shadow:0 0 0 3px var(--gold)}100%{box-shadow:0 0 0 3px transparent}}
+.chip.tmp button{color:#1a1405}
+.chip.tmp>button:first-child{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip.tmp .x{padding:7px 12px 7px 6px;color:#5a4710}.chip.tmp .x:hover{color:#9a1212}.chip .opt:hover{color:var(--text)}
+.menu{position:fixed;z-index:50;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px;box-shadow:0 12px 30px rgba(0,0,0,.55)}
+.menu button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:9px 12px;border-radius:7px}
+.menu button:hover{background:#1b2634}
+.menu .danger,.row .danger{color:#ff8a8a}
+.row .danger{margin-right:auto}
+main{flex:1;min-height:0;padding:0 22px 22px;display:grid;gap:10px}
+.pane{position:relative;display:flex;flex-direction:column;min-height:0;min-width:0;background:#000;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.bar{display:flex;align-items:center;gap:4px;padding:4px 6px 4px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+.bar b{flex:0 1 auto;max-width:26%;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar input[type=text]{flex:1;min-width:0;margin:0 10px;padding:5px 14px;background:var(--bg);border:1px solid var(--line);border-radius:999px;color:var(--mute);font-size:13px}
+.bar input[type=text]:focus{outline:none;color:var(--text);border-color:var(--gold)}
+.bar button{border:0;background:transparent;padding:4px 9px;color:var(--mute)}
+.bar button:hover{color:var(--text)}
+iframe{flex:1;width:100%;border:0;background:#000}
+.empty{place-self:center;text-align:center;color:var(--mute);max-width:34ch}
+.empty h2{margin:0 0 6px;color:var(--text);font:800 28px "Big Shoulders Display",Impact,sans-serif;letter-spacing:.03em}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:22px;width:min(440px,92vw)}
+dialog::backdrop{background:rgba(3,6,10,.72)}
+dialog h2{margin:0 0 14px;font-size:18px}
+label{display:block;margin-bottom:12px;color:var(--mute);font-size:13px}
+label.chk{display:flex;align-items:center;gap:8px;color:var(--text)}
+label.chk[hidden]{display:none}
+input[type=text],input[type=url]{display:block;width:100%;margin-top:5px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
+.row{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+@media(max-width:700px){header{padding:12px 14px 16px}header::after{left:14px;right:14px}nav,main{padding-left:14px;padding-right:14px}main{grid-template-columns:1fr!important;grid-auto-rows:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <ellipse cx="24" cy="24" rx="22" ry="17" fill="none" stroke="#f5c451" stroke-width="3"/>
+      <rect x="11" y="15" width="26" height="18" rx="3" fill="none" stroke="#e9edf2" stroke-width="1.6"/>
+      <line x1="24" y1="15" x2="24" y2="33" stroke="#e9edf2" stroke-width="1.6"/>
+      <circle cx="24" cy="24" r="4.5" fill="none" stroke="#e9edf2" stroke-width="1.6"/>
+    </svg>
+    <h1>Football Arena</h1>
+  </div>
+  <div class="tools">
+    <div class="seg" id="layout" role="group" aria-label="Layout">
+      <button data-l="0" aria-pressed="true">Auto</button><button data-l="1">1</button><button data-l="2">2</button><button data-l="3">3</button><button data-l="4">4</button>
+    </div>
+    <button id="closeAll">Close all</button>
+    <button id="export">Export</button>
+    <button id="import">Import</button>
+    <button class="primary" id="add">Add site</button>
+    <input type="file" id="file" accept="application/json" hidden>
+  </div>
+</header>
+<nav id="sites" aria-label="Your sites"></nav>
+<main id="stage"></main>
+
+<dialog id="dlg">
+  <form method="dialog" id="form">
+    <h2 id="dlgTitle">Add site</h2>
+    <label>Name<input type="text" id="name" required maxlength="40" autocomplete="off"></label>
+    <label>URL<input type="url" id="url" required placeholder="https://" autocomplete="off"></label>
+    <label class="chk" id="directRow" hidden><input type="checkbox" id="direct">Load directly (skip proxy)</label>
+    <div class="row"><button type="button" class="danger" id="del" hidden>Delete</button><button type="button" id="cancel">Cancel</button><button class="primary" type="submit">Save</button></div>
+  </form>
+</dialog>
+
+<script>
+(()=>{
+"use strict";
+// Optional: URL of the Cloudflare Worker from worker.js. When set, sites load through it so that
+// "open in new tab" links stay inside the page. Leave empty to load sites directly.
+const PROXY="";
+
+const $=s=>document.querySelector(s);
+const store={
+  get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+// Sites added automatically the first time the app opens (name + url).
+const DEFAULT_SITES=[
+  {name:"ARDASPOR",url:"https://ardaspor40.top/"},
+  {name:"INATBOX",url:"https://inattv1328.xyz/"},
+  {name:"TRGOALS",url:"https://taraftarium1087.xyz/"},
+  {name:"PATRONSPOR",url:"https://patronizle60.cfd/"},
+  {name:"MahsunSports",url:"https://mahsunsports60.xyz/"},
+  {name:"NETSPOR",url:"https://netspor.co/"},
+  {name:"Zeus TV",url:"https://zeustv276.live/",direct:true},
+  {name:"FCTV33",url:"https://www.fctv33.com/tr"},
+  {name:"Extra TV",url:"https://www.extrabet2112.com/tr/int/sport/TV"},
+  {name:"Liveball",url:"https://liveball.sx/"},
+  {name:"Arda Spor Giriş",url:"https://ardaspor.live/"},
+  {name:"Inatbox Giriş",url:"https://inattvgiris.co/"},
+  {name:"PatronSpor Giriş",url:"https://patronspor.is/"},
+  {name:"TrGoal Giriş",url:"https://taraftarium24.io/"},
+  {name:"MahsunSports Giriş",url:"https://mahsunsports.com/"}
+];
+let sites=store.get("fa.sites",[]), open=store.get("fa.open",[]).filter(id=>sites.some(s=>s.id===id)), layout=store.get("fa.layout",0);
+const panes=new Map();
+let tmp=[]; // extra panes opened from links inside sites (not saved)
+const find=id=>sites.find(s=>s.id===id)||tmp.find(s=>s.id===id);
+
+function clean(u){
+  u=u.trim(); if(!/^https?:\/\//i.test(u)) u="https://"+u;
+  try{
+    const x=new URL(u), h=x.hostname.replace(/^www\./,"");
+    if(h==="youtube.com"&&x.pathname==="/watch"&&x.searchParams.get("v")) return "https://www.youtube.com/embed/"+x.searchParams.get("v");
+    if(h==="youtu.be") return "https://www.youtube.com/embed"+x.pathname;
+    return x.href;
+  }catch{return null}
+}
+const src=(u,direct)=>PROXY&&!direct?PROXY+(PROXY.includes("?")?"&":"?")+"u="+encodeURIComponent(u):u;
+const save=()=>{store.set("fa.sites",sites);store.set("fa.open",open);store.set("fa.layout",layout)};
+
+let dragged=false;
+function drawNav(){
+  const nav=$("#sites"); nav.textContent="";
+  sites.forEach(s=>{
+    const c=document.createElement("div"); c.className="chip"; c.dataset.id=s.id;
+    if(open.includes(s.id)) c.setAttribute("aria-current","true");
+    const b=document.createElement("button"); b.textContent=s.name; b.onclick=()=>{if(!dragged)toggle(s.id)};
+    c.append(b);
+    const o=document.createElement("button"); o.className="opt"; o.textContent="⋮"; o.title="Options"; o.setAttribute("aria-label","Options for "+s.name); o.setAttribute("aria-haspopup","menu");
+    o.onclick=e=>{e.stopPropagation();showMenu(o,s)}; c.append(o);
+    nav.append(c);
+  });
+  tmp.forEach(t=>{ // temporary tabs opened from links inside sites
+    const c=document.createElement("div"); c.className="chip tmp"; c.dataset.id=t.id;
+    if(open.includes(t.id)) c.setAttribute("aria-current","true");
+    const b=document.createElement("button"); b.textContent=t.name; b.title="Click to close · "+t.url; b.onclick=()=>toggle(t.id);
+    const o=document.createElement("button"); o.className="opt"; o.textContent="+"; o.title="Add to saved sites"; o.setAttribute("aria-label","Add "+t.name+" to saved sites");
+    o.onclick=e=>{e.stopPropagation();openDlg(null,t)};
+    c.append(b,o); nav.append(c);
+  });
+}
+function makePane(s){
+  const p=document.createElement("section"); p.className="pane";
+  const bar=document.createElement("div"); bar.className="bar";
+  const t=document.createElement("b"); t.textContent=s.name;
+  const mk=(txt,label,fn)=>{const b=document.createElement("button");b.textContent=txt;b.title=label;b.setAttribute("aria-label",label);b.onclick=fn;return b};
+  const f=document.createElement("iframe");
+  f.title=s.name; f.loading="lazy"; f.referrerPolicy="no-referrer"; f.allowFullscreen=true;
+  f.allow="autoplay; fullscreen; encrypted-media; picture-in-picture; clipboard-write";
+  // No allow-popups / allow-top-navigation: nothing can open a new tab or leave the page.
+  f.setAttribute("sandbox","allow-scripts allow-same-origin allow-forms allow-presentation");
+  let cur=s.url;
+  const a=document.createElement("input"); a.type="text"; a.value=cur; a.spellcheck=false; a.autocomplete="off"; a.inputMode="url";
+  a.setAttribute("aria-label","Address for "+s.name);
+  a.onfocus=()=>a.select();
+  a.onkeydown=e=>{
+    if(e.key==="Enter"){const u=clean(a.value); if(u){cur=u;a.value=u;f.src=src(u,s.direct)} a.blur()}
+    else if(e.key==="Escape"){a.value=cur;a.blur()}
+  };
+  f.src=src(cur,s.direct);
+  bar.append(t,a,
+    mk("↻","Reload",()=>{f.src=src(cur,s.direct)}),
+    mk("⛶","Fullscreen",()=>{(p.requestFullscreen||p.webkitRequestFullscreen||(()=>{})).call(p)}),
+    mk("✕","Close",()=>toggle(s.id)));
+  p.append(bar,f); return p;
+}
+function drawStage(){
+  const m=$("#stage");
+  for(const [id,p] of panes) if(!open.includes(id)){p.remove();panes.delete(id)}
+  m.querySelector(".empty")?.remove();
+  open.forEach(id=>{
+    if(!panes.has(id)){const s=find(id); if(s){const p=makePane(s);panes.set(id,p);m.append(p)}}
+  });
+  const n=open.length;
+  if(!n){
+    const e=document.createElement("div"); e.className="empty";
+    e.innerHTML=sites.length?"<h2>Pick a site</h2>Tap a site above to play it here. Open several to watch side by side.":"<h2>Add your first site</h2>Press Add site, enter a name and URL, then tap it to play.";
+    m.append(e); m.style.gridTemplateColumns="1fr"; return;
+  }
+  const cols=layout||Math.ceil(Math.sqrt(n));
+  m.style.gridTemplateColumns="repeat("+cols+",minmax(0,1fr))";
+  m.style.gridAutoRows="minmax(0,1fr)";
+}
+function drawLayout(){document.querySelectorAll("#layout button").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.l===layout))}
+function sync(){save();drawNav();drawStage();drawLayout()}
+function toggle(id){
+  open=open.includes(id)?open.filter(i=>i!==id):[...open,id];
+  if(!open.includes(id)) tmp=tmp.filter(t=>t.id!==id); // closing a temporary tab removes it
+  sync();
+}
+function focusPane(id){
+  const p=panes.get(id); if(!p) return;
+  p.scrollIntoView({block:"nearest",inline:"nearest"});
+  p.classList.remove("flash"); void p.offsetWidth; p.classList.add("flash");
+}
+
+(()=>{ // drag a site button left or right to change the order
+  const nav=$("#sites"); let d=null;
+  nav.addEventListener("pointerdown",e=>{
+    const c=e.target.closest(".chip");
+    if(!c||e.button||c.classList.contains("tmp")||e.target.closest(".opt")) return;
+    d={c,x:e.clientX,on:false,px:e.clientX};
+  });
+  addEventListener("pointermove",e=>{
+    if(!d) return; d.px=e.clientX;
+    if(!d.on){ if(Math.abs(e.clientX-d.x)<6) return; d.on=true; dragged=true; closeMenu(); d.c.classList.add("drag"); document.body.style.userSelect="none"; }
+    let before=null;
+    for(const o of nav.children){ if(o===d.c) continue; const r=o.getBoundingClientRect(); if(e.clientX<r.left+r.width/2){before=o;break} }
+    if(before!==d.c.nextSibling) nav.insertBefore(d.c,before);
+  });
+  setInterval(()=>{ // scroll the bar when dragging near its edges
+    if(!d||!d.on) return; const r=nav.getBoundingClientRect();
+    if(d.px<r.left+50) nav.scrollLeft-=12; else if(d.px>r.right-50) nav.scrollLeft+=12;
+  },30);
+  const end=()=>{
+    if(!d) return; const was=d.on; d.c.classList.remove("drag"); document.body.style.userSelect=""; d=null;
+    if(was){
+      sites=[...nav.children].map(c=>sites.find(s=>s.id===c.dataset.id)).filter(Boolean); save();
+      drawNav(); setTimeout(()=>{dragged=false},60);
+    }
+  };
+  addEventListener("pointerup",end); addEventListener("pointercancel",end);
+})();
+addEventListener("message",e=>{ // a proxied site asked to open a link in a new tab
+  const d=e.data; if(!d||d.fa!=="open"||typeof d.url!=="string") return;
+  let from=null; for(const [id,p] of panes) if(p.querySelector("iframe")?.contentWindow===e.source){from=id;break}
+  const url=clean(d.url); if(!url) return;
+  let host; try{host=new URL(url).hostname.replace(/^www\./,"")}catch{return}
+  let s=tmp.find(t=>t.url===url);
+  if(!s){s={id:"t"+Date.now().toString(36),name:host,url,direct:false}; tmp.push(s)}
+  if(!open.includes(s.id)){const i=from?open.indexOf(from):-1; open.splice(i<0?open.length:i+1,0,s.id)}
+  sync(); focusPane(s.id);
+});
+$("#layout").onclick=e=>{const b=e.target.closest("button");if(b){layout=+b.dataset.l;sync()}};
+$("#closeAll").onclick=()=>{open=[];sync()};
+const dlg=$("#dlg");
+let editing=null, promoting=null, menuEl=null;
+function closeMenu(){menuEl&&menuEl.remove();menuEl=null}
+function showMenu(btn,s){
+  const again=menuEl&&menuEl.dataset.id===s.id; closeMenu(); if(again) return;
+  const m=document.createElement("div"); m.className="menu"; m.setAttribute("role","menu"); m.dataset.id=s.id;
+  const item=(t,fn,cls)=>{const b=document.createElement("button");b.textContent=t;b.setAttribute("role","menuitem");if(cls)b.className=cls;b.onclick=()=>{closeMenu();fn()};m.append(b)};
+  if(tmp.some(t=>t.id===s.id)){
+    item("Add",()=>openDlg(null,s));
+    item("Close",()=>toggle(s.id));
+  }else{
+    item("Edit",()=>openDlg(s));
+    item("Delete",()=>removeSite(s),"danger");
+  }
+  document.body.append(m); menuEl=m;
+  const r=btn.getBoundingClientRect();
+  m.style.top=r.bottom+6+"px"; m.style.left=Math.max(8,Math.min(r.left,innerWidth-m.offsetWidth-8))+"px";
+  m.querySelector("button").focus();
+}
+document.addEventListener("click",closeMenu);
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMenu()});
+addEventListener("resize",closeMenu); $("#sites").addEventListener("scroll",closeMenu);
+function removeSite(s){
+  if(!confirm("Delete "+s.name+"?")) return;
+  sites=sites.filter(t=>t.id!==s.id); open=open.filter(i=>i!==s.id); sync();
+}
+function openDlg(s,fromTmp){
+  editing=s||null; promoting=fromTmp||null; $("#form").reset();
+  $("#dlgTitle").textContent=s?"Edit site":fromTmp?"Add to saved sites":"Add site";
+  $("#del").hidden=!s;
+  $("#directRow").hidden=!(s&&PROXY);
+  if(s){$("#name").value=s.name;$("#url").value=s.url;$("#direct").checked=!!s.direct}
+  if(fromTmp){
+    const a=panes.get(fromTmp.id)?.querySelector("input");
+    $("#url").value=(a&&a.value)||fromTmp.url; promoting.initial=clean($("#url").value);
+  }
+  dlg.showModal(); $("#name").focus();
+}
+$("#add").onclick=()=>openDlg();
+$("#del").onclick=()=>{const s=editing; dlg.close(); if(s) removeSite(s)};
+$("#cancel").onclick=()=>dlg.close();
+$("#form").onsubmit=()=>{
+  const url=clean($("#url").value); if(!url) return;
+  const name=$("#name").value.trim();
+  if(editing){
+    editing.name=name; editing.url=url;
+    if(PROXY) editing.direct=$("#direct").checked;
+    const p=panes.get(editing.id); if(p){p.remove();panes.delete(editing.id)}
+  }else if(promoting){
+    const t=promoting; tmp=tmp.filter(i=>i.id!==t.id);
+    sites.push({id:t.id,name,url,direct:false});
+    const p=panes.get(t.id);
+    if(p){ if(url!==t.initial){p.remove();panes.delete(t.id)} else p.querySelector("b").textContent=name }
+    if(!open.includes(t.id)) open.push(t.id);
+  }else{
+    const s={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,url};
+    sites.push(s); open.push(s.id);
+  }
+  sync();
+};
+$("#export").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(sites.map(({name,url,direct})=>direct?{name,url,direct}:{name,url}),null,2)],{type:"application/json"}));
+  a.download="football-arena-sites.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+$("#import").onclick=()=>$("#file").click();
+$("#file").onchange=async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const list=JSON.parse(await f.text()); if(!Array.isArray(list)) throw 0;
+    list.forEach(x=>{const url=x&&x.url&&clean(String(x.url)); if(url&&x.name&&!sites.some(s=>s.url===url))
+      sites.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:String(x.name).slice(0,40),url,direct:!!x.direct})});
+    sync();
+  }catch{alert("That file isn’t a valid sites list.")}
+  e.target.value="";
+};
+if(store.get("fa.seed",0)<4){ // bump this number to replace everyone's list with DEFAULT_SITES once
+  const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  sites=DEFAULT_SITES.map(x=>({id:uid(),name:x.name,url:clean(x.url)||x.url,direct:!!x.direct}));
+  open=[]; store.set("fa.seed",4); save();
+}
+sync();
+})();
+</script>
+</body>
+</html>
