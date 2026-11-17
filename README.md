@@ -18,4 +18,3 @@ The default address is `https://YOUR-USERNAME.github.io/REPOSITORY-NAME/`. A rep
 ## Browser limitations
 
 Some sites prevent being displayed inside another page. Use the open-in-new-tab button on a panel in that case. The website cannot bypass a site’s embedding restrictions. Hosting under GitHub Pages also cannot guarantee access from every Turkish ISP.
-
