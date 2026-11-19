@@ -74,7 +74,7 @@
       imported: "Site listesi içe aktarıldı.", badFile: "Bu dosya geçerli bir Kickoff site listesi değil."
     }
   };
-  let lang = "en";
+  let lang = (navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en";
   try { const saved = localStorage.getItem("fa.web.lang"); if (saved && I18N[saved]) lang = saved; } catch {}
   const t = (key, vars) => {
     let text = I18N[lang][key] ?? I18N.en[key] ?? key;
