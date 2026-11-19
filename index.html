@@ -19,23 +19,24 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="./" aria-label="Kickoff home">
+    <a class="brand" href="./" aria-label="Kickoff home" data-i18n-aria-label="home">
       <svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="22" ry="17" fill="none" stroke="currentColor" stroke-width="3"/><rect x="11" y="15" width="26" height="18" rx="3" fill="none" stroke="#e9edf2" stroke-width="1.6"/><path d="M24 15v18M11 24h26" fill="none" stroke="#e9edf2" stroke-width="1.6"/><circle cx="24" cy="24" r="4.5" fill="none" stroke="#e9edf2" stroke-width="1.6"/></svg>
       <span>KICKOFF!</span>
     </a>
     <div class="toolbar">
-      <div class="seg" id="layout" role="group" aria-label="Panel layout">
-        <button data-layout="0" aria-pressed="true">Auto</button><button data-layout="1">1</button><button data-layout="2">2</button><button data-layout="3">3</button><button data-layout="4">4</button>
+      <div class="seg" id="lang" role="group" aria-label="Language" data-i18n-aria-label="language"><button type="button" data-lang="en" lang="en" aria-pressed="true" title="English">EN</button><button type="button" data-lang="tr" lang="tr" aria-pressed="false" title="Türkçe">TR</button></div>
+      <div class="seg" id="layout" role="group" aria-label="Panel layout" data-i18n-aria-label="panelLayout">
+        <button data-layout="0" aria-pressed="true" data-i18n-text="auto">Auto</button><button data-layout="1">1</button><button data-layout="2">2</button><button data-layout="3">3</button><button data-layout="4">4</button>
       </div>
-      <button id="closeAll">Close all</button>
-      <button id="settingsBtn" aria-haspopup="dialog">Settings</button>
-      <button id="addSite" class="primary">Add site</button>
+      <button id="closeAll" data-i18n-text="closeAll">Close all</button>
+      <button id="settingsBtn" aria-haspopup="dialog" data-i18n-text="settings">Settings</button>
+      <button id="addSite" class="primary" data-i18n-text="addSite">Add site</button>
     </div>
   </header>
 
-  <nav class="sitebar" aria-label="Your saved sites">
+  <nav class="sitebar" aria-label="Your saved sites" data-i18n-aria-label="savedSites">
     <div id="sites"></div>
-    <button id="quickBtn" class="quick-btn" aria-haspopup="true" aria-expanded="false"><span class="bolt">ϟ</span><span>Quick access</span><span class="count" id="quickCount">0</span><span class="chevron">⌄</span></button>
+    <button id="quickBtn" class="quick-btn" aria-haspopup="true" aria-expanded="false"><span class="bolt">ϟ</span><span data-i18n-text="quickAccess">Quick access</span><span class="count" id="quickCount">0</span><span class="chevron">⌄</span></button>
   </nav>
 
   <main id="stage" aria-live="polite"></main>
@@ -43,19 +44,19 @@
 
   <dialog id="siteDialog">
     <form id="siteForm">
-      <div class="dialog-head"><h2 id="siteTitle">Add site</h2><button type="button" class="icon-btn" data-close="siteDialog" aria-label="Close">×</button></div>
-      <label>Site name<input id="siteName" required maxlength="40" autocomplete="off" placeholder="My football site"></label>
-      <label>Website address<input id="siteUrl" required type="url" placeholder="https://example.com" autocomplete="url" autocapitalize="off" spellcheck="false"></label>
-      <label class="quick-toggle"><input id="siteQuick" type="checkbox"> Add to Quick access</label>
-      <div class="form-actions"><button id="deleteSite" type="button" class="danger hidden">Delete</button><span></span><button type="button" data-close="siteDialog">Cancel</button><button class="primary" type="submit">Save site</button></div>
+      <div class="dialog-head"><h2 id="siteTitle" data-i18n-text="addSite">Add site</h2><button type="button" class="icon-btn" data-close="siteDialog" aria-label="Close" data-i18n-aria-label="close">×</button></div>
+      <label><span data-i18n-text="siteName">Site name</span><input id="siteName" required maxlength="40" autocomplete="off" placeholder="My football site" data-i18n-placeholder="siteNamePh"></label>
+      <label><span data-i18n-text="siteUrl">Website address</span><input id="siteUrl" required type="url" placeholder="https://example.com" autocomplete="url" autocapitalize="off" spellcheck="false"></label>
+      <label class="quick-toggle"><input id="siteQuick" type="checkbox"> <span data-i18n-text="addToQuick">Add to Quick access</span></label>
+      <div class="form-actions"><button id="deleteSite" type="button" class="danger hidden" data-i18n-text="delete">Delete</button><span></span><button type="button" data-close="siteDialog" data-i18n-text="cancel">Cancel</button><button class="primary" type="submit" data-i18n-text="saveSite">Save site</button></div>
     </form>
   </dialog>
 
   <dialog id="settingsDialog">
-    <div class="dialog-head"><h2>Settings</h2><button type="button" class="icon-btn" data-close="settingsDialog" aria-label="Close">×</button></div>
+    <div class="dialog-head"><h2 data-i18n-text="settings">Settings</h2><button type="button" class="icon-btn" data-close="settingsDialog" aria-label="Close" data-i18n-aria-label="close">×</button></div>
     <div class="settings-content">
-      <section><h3>Site list</h3><p>Save a backup of your Kickoff site list or add sites from a JSON file. Your list and layout are stored in this browser.</p><div class="settings-actions"><button id="exportSites">Export sites</button><button id="importSites">Import sites</button><input id="importFile" type="file" accept="application/json" hidden></div><p id="status" role="status"></p></section>
-      <section><h3>Browser limits</h3><p>Some websites block being shown inside another page. Use the open-in-new-tab button on that panel if it stays blank. Browser rules also prevent this page from changing another site's video volume or reliably checking whether its links are online.</p></section>
+      <section><h3 data-i18n-text="siteList">Site list</h3><p data-i18n-text="siteListText">Save a backup of your Kickoff site list or add sites from a JSON file. Your list and layout are stored in this browser.</p><div class="settings-actions"><button id="exportSites" data-i18n-text="exportSites">Export sites</button><button id="importSites" data-i18n-text="importSites">Import sites</button><input id="importFile" type="file" accept="application/json" hidden></div><p id="status" role="status"></p></section>
+      <section><h3 data-i18n-text="browserLimits">Browser limits</h3><p data-i18n-text="browserLimitsText">Some websites block being shown inside another page. Use the open-in-new-tab button on that panel if it stays blank. Browser rules also prevent this page from changing another site's video volume or reliably checking whether its links are online.</p></section>
     </div>
   </dialog>
 

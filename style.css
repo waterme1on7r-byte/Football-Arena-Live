@@ -43,7 +43,7 @@ label.quick-toggle input { width: 19px; height: 19px; margin: 0; accent-color: v
   }
   .topbar::after { left: var(--left-edge); right: var(--right-edge); }
   .brand { min-width: 0; }
-  .toolbar { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .toolbar { display: grid; grid-template-columns: auto repeat(3, minmax(0, 1fr)); }
   .toolbar > button { padding-inline: 5px; }
   #layout { display: none; }
   .sitebar { display: block; min-height: 0; padding: 10px var(--right-edge) 12px var(--left-edge); }
@@ -111,3 +111,5 @@ label.quick-toggle input { width: 19px; height: 19px; margin: 0; accent-color: v
   .form-actions { flex-wrap: wrap; }
   .form-actions button { padding-inline: 9px; }
 }
+
+#lang button { min-width: 40px; font-weight: 700; letter-spacing: .04em; }

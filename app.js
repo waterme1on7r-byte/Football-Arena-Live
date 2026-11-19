@@ -19,6 +19,98 @@
     { id: "mahsunsports-giris", name: "MahsunSports Giriş", url: "https://mahsunsports.com/", quick: true }
   ];
 
+
+  const I18N = {
+    en: {
+      home: "Kickoff home", language: "Language", panelLayout: "Panel layout", auto: "Auto",
+      closeAll: "Close all", settings: "Settings", addSite: "Add site", editSite: "Edit site",
+      savedSites: "Your saved sites", quickAccess: "Quick access", quickAccessSites: "Quick access sites",
+      close: "Close", siteName: "Site name", siteNamePh: "My football site", siteUrl: "Website address",
+      addToQuick: "Add to Quick access", delete: "Delete", cancel: "Cancel", saveSite: "Save site",
+      siteList: "Site list",
+      siteListText: "Save a backup of your Kickoff site list or add sites from a JSON file. Your list and layout are stored in this browser.",
+      exportSites: "Export sites", importSites: "Import sites", browserLimits: "Browser limits",
+      browserLimitsText: "Some websites block being shown inside another page. Use the open-in-new-tab button on that panel if it stays blank. Browser rules also prevent this page from changing another site's video volume or reliably checking whether its links are online.",
+      optionsFor: "Options for {name}", addressFor: "Address for {name}",
+      cantDisplay: "Can’t display this site here",
+      cantDisplayText: "Some websites prevent being embedded in another page. Open it in a separate tab to continue.",
+      openNewTab: "Open site in new tab", reload: "Reload {name}", openIn: "Open {name} in a new tab",
+      fullscreen: "Fullscreen {name}", closeSite: "Close {name}",
+      chooseSite: "Choose a site", addFirst: "Add your first site",
+      chooseText: "Select a saved site above or use Quick access. Open several panels to arrange your arena.",
+      addFirstText: "Add a name and website address to get started.",
+      closePanel: "Close panel", openPanel: "Open panel",
+      removeQuick: "Remove from Quick access", addQuick: "Add to Quick access",
+      openTab: "Open in new tab", deleteSite: "Delete site",
+      confirmDelete: "Delete {name} from your saved sites?",
+      quickAddBtn: "+ Add site", quickAddTitle: "Add a site to Quick access",
+      quickEmpty: "Nothing here yet. Use a site’s options menu to add it.",
+      imported: "Site list imported.", badFile: "That file isn’t a valid Kickoff sites list."
+    },
+    tr: {
+      home: "Kickoff ana sayfa", language: "Dil", panelLayout: "Panel düzeni", auto: "Otomatik",
+      closeAll: "Tümünü kapat", settings: "Ayarlar", addSite: "Site ekle", editSite: "Siteyi düzenle",
+      savedSites: "Kayıtlı siteleriniz", quickAccess: "Hızlı erişim", quickAccessSites: "Hızlı erişim siteleri",
+      close: "Kapat", siteName: "Site adı", siteNamePh: "Futbol sitem", siteUrl: "Web adresi",
+      addToQuick: "Hızlı erişime ekle", delete: "Sil", cancel: "İptal", saveSite: "Siteyi kaydet",
+      siteList: "Site listesi",
+      siteListText: "Kickoff site listenizin yedeğini kaydedin veya bir JSON dosyasından site ekleyin. Listeniz ve düzeniniz bu tarayıcıda saklanır.",
+      exportSites: "Siteleri dışa aktar", importSites: "Siteleri içe aktar", browserLimits: "Tarayıcı sınırlamaları",
+      browserLimitsText: "Bazı web siteleri başka bir sayfanın içinde gösterilmeyi engeller. Panel boş kalırsa o paneldeki yeni sekmede aç düğmesini kullanın. Tarayıcı kuralları ayrıca bu sayfanın başka bir sitenin video ses düzeyini değiştirmesini veya bağlantılarının çevrimiçi olup olmadığını güvenilir şekilde denetlemesini engeller.",
+      optionsFor: "{name} için seçenekler", addressFor: "{name} adresi",
+      cantDisplay: "Bu site burada gösterilemiyor",
+      cantDisplayText: "Bazı web siteleri başka bir sayfaya gömülmeyi engeller. Devam etmek için ayrı bir sekmede açın.",
+      openNewTab: "Siteyi yeni sekmede aç", reload: "{name} sitesini yeniden yükle", openIn: "{name} sitesini yeni sekmede aç",
+      fullscreen: "{name} tam ekran", closeSite: "{name} sitesini kapat",
+      chooseSite: "Bir site seçin", addFirst: "İlk sitenizi ekleyin",
+      chooseText: "Yukarıdan kayıtlı bir site seçin veya Hızlı erişimi kullanın. Arenanızı düzenlemek için birkaç panel açın.",
+      addFirstText: "Başlamak için bir ad ve web adresi ekleyin.",
+      closePanel: "Paneli kapat", openPanel: "Paneli aç",
+      removeQuick: "Hızlı erişimden kaldır", addQuick: "Hızlı erişime ekle",
+      openTab: "Yeni sekmede aç", deleteSite: "Siteyi sil",
+      confirmDelete: "{name} kayıtlı sitelerinizden silinsin mi?",
+      quickAddBtn: "+ Site ekle", quickAddTitle: "Hızlı erişime site ekle",
+      quickEmpty: "Burada henüz bir şey yok. Eklemek için sitenin seçenekler menüsünü kullanın.",
+      imported: "Site listesi içe aktarıldı.", badFile: "Bu dosya geçerli bir Kickoff site listesi değil."
+    }
+  };
+  let lang = "en";
+  try { const saved = localStorage.getItem("fa.web.lang"); if (saved && I18N[saved]) lang = saved; } catch {}
+  const t = (key, vars) => {
+    let text = I18N[lang][key] ?? I18N.en[key] ?? key;
+    for (const name in vars) text = text.split("{" + name + "}").join(vars[name]);
+    return text;
+  };
+  // Translatable elements carry data-i18n-* attributes, so switching language
+  // updates them in place without rebuilding panels (which would reload the iframes).
+  const applyOne = el => {
+    const vars = el.dataset.i18nVars ? JSON.parse(el.dataset.i18nVars) : undefined;
+    if (el.dataset.i18nText) el.textContent = t(el.dataset.i18nText, vars);
+    if (el.dataset.i18nTitle) el.title = t(el.dataset.i18nTitle, vars);
+    if (el.dataset.i18nAriaLabel) el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel, vars));
+    if (el.dataset.i18nPlaceholder) el.placeholder = t(el.dataset.i18nPlaceholder, vars);
+  };
+  const applyI18n = (root = document) => {
+    if (root !== document) applyOne(root);
+    root.querySelectorAll("[data-i18n-text],[data-i18n-title],[data-i18n-aria-label],[data-i18n-placeholder]").forEach(applyOne);
+  };
+  const tag = (el, spec, vars) => {
+    if (spec.text) el.dataset.i18nText = spec.text;
+    if (spec.title) el.dataset.i18nTitle = spec.title;
+    if (spec.aria) el.dataset.i18nAriaLabel = spec.aria;
+    if (vars) el.dataset.i18nVars = JSON.stringify(vars);
+    applyOne(el);
+    return el;
+  };
+  function setLang(next) {
+    if (!I18N[next]) return;
+    lang = next;
+    try { localStorage.setItem("fa.web.lang", next); } catch {}
+    document.documentElement.lang = next;
+    document.querySelectorAll("#lang button").forEach(item => item.setAttribute("aria-pressed", String(item.dataset.lang === next)));
+    applyI18n();
+  }
+
   const $ = (selector, root = document) => root.querySelector(selector);
   const uid = () => "site-" + Math.random().toString(36).slice(2, 10);
   const validUrl = (value) => {
@@ -57,13 +149,12 @@
     return node;
   }
 
-  function button(label, className, title, action) {
+  function button(label, className, titleKey, vars, action) {
     const node = document.createElement("button");
     node.type = "button";
     node.className = className;
     node.textContent = label;
-    node.title = title;
-    node.setAttribute("aria-label", title);
+    tag(node, { title: titleKey, aria: titleKey }, vars);
     node.addEventListener("click", action);
     return node;
   }
@@ -79,7 +170,7 @@
     go.className = "go";
     go.append(avatar(site.name), document.createTextNode(site.name));
     go.addEventListener("click", () => togglePane(site.id));
-    const more = button("⋮", "more", "Options for " + site.name, event => {
+    const more = button("⋮", "more", "optionsFor", { name: site.name }, event => {
       event.stopPropagation(); showMenu(more, site);
     });
     chip.append(go, more);
@@ -123,7 +214,7 @@
     const address = document.createElement("input");
     address.type = "text";
     address.value = site.url;
-    address.setAttribute("aria-label", "Address for " + site.name);
+    tag(address, { aria: "addressFor" }, { name: site.name });
     address.spellcheck = false;
     address.addEventListener("focus", () => address.select());
     address.addEventListener("keydown", event => {
@@ -148,18 +239,20 @@
     frame.src = site.url;
     const error = document.createElement("div");
     error.className = "frame-error";
-    error.innerHTML = "<div><h3>Can’t display this site here</h3><p>Some websites prevent being embedded in another page. Open it in a separate tab to continue.</p></div>";
+    const errorBox = document.createElement("div");
+    errorBox.append(tag(document.createElement("h3"), { text: "cantDisplay" }), tag(document.createElement("p"), { text: "cantDisplayText" }));
+    error.append(errorBox);
     const launch = document.createElement("button");
     launch.type = "button";
     launch.className = "primary";
-    launch.textContent = "Open site in new tab";
+    tag(launch, { text: "openNewTab" });
     launch.addEventListener("click", () => window.open(site.url, "_blank", "noopener,noreferrer"));
     error.firstElementChild.append(launch);
     // Browsers do not expose cross-origin frame errors consistently. Keep a visible fallback in the pane toolbar.
-    const reload = button("↻", "", "Reload " + site.name, () => { error.classList.remove("show"); frame.src = address.value; });
-    const external = button("↗", "", "Open " + site.name + " in a new tab", () => window.open(validUrl(address.value) || site.url, "_blank", "noopener,noreferrer"));
-    const fullscreen = button("⛶", "", "Fullscreen " + site.name, () => pane.requestFullscreen?.());
-    const close = button("×", "", "Close " + site.name, () => togglePane(site.id));
+    const reload = button("↻", "", "reload", { name: site.name }, () => { error.classList.remove("show"); frame.src = address.value; });
+    const external = button("↗", "", "openIn", { name: site.name }, () => window.open(validUrl(address.value) || site.url, "_blank", "noopener,noreferrer"));
+    const fullscreen = button("⛶", "", "fullscreen", { name: site.name }, () => pane.requestFullscreen?.());
+    const close = button("×", "", "closeSite", { name: site.name }, () => togglePane(site.id));
     bar.append(title, address, reload, external, fullscreen, close);
     frameWrap.append(frame, error);
     pane.append(bar, frameWrap);
@@ -173,14 +266,14 @@
       const empty = document.createElement("div");
       empty.className = "empty";
       const heading = document.createElement("h2");
-      heading.textContent = sites.length ? "Choose a site" : "Add your first site";
+      tag(heading, { text: sites.length ? "chooseSite" : "addFirst" });
       const text = document.createElement("p");
-      text.textContent = sites.length ? "Select a saved site above or use Quick access. Open several panels to arrange your arena." : "Add a name and website address to get started.";
+      tag(text, { text: sites.length ? "chooseText" : "addFirstText" });
       empty.append(heading, text);
       if (!sites.length) {
         const add = document.createElement("button");
         add.className = "primary";
-        add.textContent = "Add site";
+        tag(add, { text: "addSite" });
         add.addEventListener("click", openAddDialog);
         empty.append(add);
       }
@@ -224,16 +317,16 @@
       control.addEventListener("click", () => { $menuRoot.replaceChildren(); action(); });
       menu.append(control);
     };
-    item(open.includes(site.id) ? "Close panel" : "Open panel", () => togglePane(site.id));
-    item(site.quick ? "Remove from Quick access" : "Add to Quick access", () => {
+    item(open.includes(site.id) ? t("closePanel") : t("openPanel"), () => togglePane(site.id));
+    item(site.quick ? t("removeQuick") : t("addQuick"), () => {
       site.quick = !site.quick;
       if (!site.quick) delete site.quick;
       render();
     });
-    item("Edit site", () => openEditDialog(site));
-    item("Open in new tab", () => window.open(site.url, "_blank", "noopener,noreferrer"));
-    item("Delete site", () => {
-      if (confirm(`Delete ${site.name} from your saved sites?`)) {
+    item(t("editSite"), () => openEditDialog(site));
+    item(t("openTab"), () => window.open(site.url, "_blank", "noopener,noreferrer"));
+    item(t("deleteSite"), () => {
+      if (confirm(t("confirmDelete", { name: site.name }))) {
         sites = sites.filter(item => item.id !== site.id);
         open = open.filter(id => id !== site.id);
         render();
@@ -248,24 +341,25 @@
     const panel = existing || document.createElement("div");
     panel.className = "quick-panel";
     panel.setAttribute("role", "dialog");
-    panel.setAttribute("aria-label", "Quick access sites");
+    tag(panel, { aria: "quickAccessSites" });
     panel.replaceChildren();
     const header = document.createElement("div");
     header.className = "quick-head";
     const heading = document.createElement("h3");
-    heading.textContent = "Quick access";
-    const add = button("+ Add site", "quick-add", "Add a site to Quick access", () => {
+    tag(heading, { text: "quickAccess" });
+    const add = button("", "quick-add", "quickAddTitle", undefined, () => {
       $("#quickBtn").setAttribute("aria-expanded", "false");
       renderQuickPanel();
       openAddDialog(true);
     });
+    tag(add, { text: "quickAddBtn", title: "quickAddTitle", aria: "quickAddTitle" });
     header.append(heading, add);
     panel.append(header);
     const favorites = sites.filter(site => site.quick);
     if (!favorites.length) {
       const hint = document.createElement("p");
       hint.className = "empty-hint";
-      hint.textContent = "Nothing here yet. Use a site’s options menu to add it.";
+      tag(hint, { text: "quickEmpty" });
       panel.append(hint);
     }
     favorites.forEach(site => {
@@ -285,7 +379,7 @@
       copy.append(label, small);
       go.append(copy);
       go.addEventListener("click", () => togglePane(site.id));
-      const opt = button("⋮", "more", "Options for " + site.name, event => {
+      const opt = button("⋮", "more", "optionsFor", { name: site.name }, event => {
         event.stopPropagation(); showMenu(opt, site);
       });
       row.append(go, opt);
@@ -296,7 +390,7 @@
 
   function openAddDialog(quick = false) {
     editingId = null;
-    $("#siteTitle").textContent = "Add site";
+    tag($("#siteTitle"), { text: "addSite" });
     $("#siteName").value = "";
     $("#siteUrl").value = "https://";
     $("#siteQuick").checked = quick === true;
@@ -307,7 +401,7 @@
 
   function openEditDialog(site) {
     editingId = site.id;
-    $("#siteTitle").textContent = "Edit site";
+    tag($("#siteTitle"), { text: "editSite" });
     $("#siteName").value = site.name;
     $("#siteUrl").value = site.url;
     $("#siteQuick").checked = Boolean(site.quick);
@@ -331,7 +425,7 @@
 
   $("#deleteSite").addEventListener("click", () => {
     const site = sites.find(item => item.id === editingId);
-    if (site && confirm(`Delete ${site.name} from your saved sites?`)) {
+    if (site && confirm(t("confirmDelete", { name: site.name }))) {
       sites = sites.filter(item => item.id !== editingId);
       open = open.filter(id => id !== editingId);
       $("#siteDialog").close();
@@ -339,6 +433,10 @@
     }
   });
 
+  $("#lang").addEventListener("click", event => {
+    const target = event.target.closest("button[data-lang]");
+    if (target) setLang(target.dataset.lang);
+  });
   $("#addSite").addEventListener("click", openAddDialog);
   $("#closeAll").addEventListener("click", () => { open = []; render(); });
   $("#layout").addEventListener("click", event => {
@@ -383,10 +481,11 @@
         if (url && name && !sites.some(site => site.url === url)) sites.push({ id: uid(), name, url, ...(item.quick ? { quick: true } : {}) });
       });
       render();
-      $("#status").textContent = "Site list imported.";
-    } catch { alert("That file isn’t a valid Kickoff sites list."); }
+      tag($("#status"), { text: "imported" });
+    } catch { alert(t("badFile")); }
     event.target.value = "";
   });
 
+  setLang(lang);
   render();
 })();
