@@ -151,7 +151,7 @@ KICKOFF! then launches full screen like a native app.
 | Add another language | Add a new object to `I18N` in `app.js` (copy the `en` block), then add a button with a matching `data-lang` value inside `#lang` in `index.html`. |
 | Change colors | Edit the CSS variables (`--bg`, `--panel`, `--gold`, …) at the top of `style.css`. |
 | Adjust the mobile bottom spacing | Change `--qgap` in the mobile section of `style.css`. |
-| Change app name or icons | Edit `kickoff.webmanifest`, `kickoff-icon.svg`, and `kickoff-touch.png`. |
+| Change app name or icons | Edit `kickoff.webmanifest` and replace the icon files (`kickoff-touch.png`, `kickoff-icon-192.png`, `kickoff-icon-512.png`, `favicon.ico`). Keep the `?v=` number in `index.html` and bump it so browsers fetch the new icons. iPhone caches Home Screen icons, so remove and re-add the app to see a change. |
 
 ## Project structure
 
@@ -164,8 +164,11 @@ kickoff/
 ├── app.js                     # App logic, translations, storage
 ├── style.css                  # Desktop and mobile styling
 ├── kickoff.webmanifest        # Installable web app manifest
-├── kickoff-icon.svg           # App icon
-├── kickoff-touch.png          # 180×180 Apple touch icon
+├── kickoff-touch.png          # 180×180 Apple touch icon (iPhone Home Screen)
+├── kickoff-icon-192.png       # Manifest icon
+├── kickoff-icon-512.png       # Manifest icon
+├── favicon.ico                # Browser tab icon (16–256 px)
+├── favicon-32.png             # Browser tab icon (PNG)
 └── README.md
 ```
 
