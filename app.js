@@ -10,8 +10,6 @@
     { id: "netspor", name: "NETSPOR", url: "https://netspor.co/" },
     { id: "zeustv", name: "Zeus TV", url: "https://zeustv276.live/" },
     { id: "fctv33", name: "FCTV33", url: "https://www.fctv33.com/tr" },
-    { id: "extratv", name: "Extra TV", url: "https://www.extrabet2112.com/tr/int/sport/TV" },
-    { id: "liveball", name: "Liveball", url: "https://liveball.sx/" },
     { id: "ardaspor-giris", name: "Arda Spor Giriş", url: "https://ardaspor.live/", quick: true },
     { id: "inatbox-giris", name: "Inatbox Giriş", url: "https://inattvgiris.co/", quick: true },
     { id: "patronspor-giris", name: "PatronSpor Giriş", url: "https://patronspor.is/", quick: true },
