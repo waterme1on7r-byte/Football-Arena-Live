@@ -22,6 +22,9 @@
 
   const I18N = {
     en: {
+      links: "Links", updateLinks: "Update links", linksChecking: "Checking for new links…",
+      linksText: "Sites change addresses often. Kickoff checks the link list published with this app and updates matching sites for you. Sites you added yourself are never changed.",
+      linksUpToDate: "Your links are up to date.", linksUpdated: "Links updated: {n}", linksFailed: "Couldn’t reach the link list. Try again later.",
       home: "Kickoff home", language: "Language", panelLayout: "Panel layout", auto: "Auto",
       closeAll: "Close all", settings: "Settings", addSite: "Add site", editSite: "Edit site",
       savedSites: "Your saved sites", quickAccess: "Quick access", quickAccessSites: "Quick access sites",
@@ -48,6 +51,9 @@
       imported: "Site list imported.", badFile: "That file isn’t a valid Kickoff sites list."
     },
     tr: {
+      links: "Bağlantılar", updateLinks: "Bağlantıları güncelle", linksChecking: "Yeni bağlantılar kontrol ediliyor…",
+      linksText: "Sitelerin adresleri sık sık değişir. Kickoff, bu uygulamayla yayınlanan bağlantı listesini kontrol eder ve eşleşen siteleri sizin için günceller. Kendi eklediğiniz siteler asla değiştirilmez.",
+      linksUpToDate: "Bağlantılarınız güncel.", linksUpdated: "Güncellenen bağlantılar: {n}", linksFailed: "Bağlantı listesine ulaşılamadı. Daha sonra tekrar deneyin.",
       home: "Kickoff ana sayfa", language: "Dil", panelLayout: "Panel düzeni", auto: "Otomatik",
       closeAll: "Tümünü kapat", settings: "Ayarlar", addSite: "Site ekle", editSite: "Siteyi düzenle",
       savedSites: "Kayıtlı siteleriniz", quickAccess: "Hızlı erişim", quickAccessSites: "Hızlı erişim siteleri",
@@ -74,7 +80,7 @@
       imported: "Site listesi içe aktarıldı.", badFile: "Bu dosya geçerli bir Kickoff site listesi değil."
     }
   };
-  let lang = (navigator.language || "").toLowerCase().startsWith("tr") ? "tr" : "en";
+  let lang = "en";
   try { const saved = localStorage.getItem("fa.web.lang"); if (saved && I18N[saved]) lang = saved; } catch {}
   const t = (key, vars) => {
     let text = I18N[lang][key] ?? I18N.en[key] ?? key;
@@ -126,6 +132,8 @@
   let sites = read("sites", null);
   if (!Array.isArray(sites)) sites = DEFAULT_SITES.map(site => ({ ...site }));
   sites = sites.filter(site => site && site.name && validUrl(site.url)).map(site => ({ ...site, url: validUrl(site.url), id: site.id || uid() }));
+  let dismissed = read("dismissed", []);
+  if (!Array.isArray(dismissed)) dismissed = [];
   let layout = Number(read("layout", 0)) || 0;
   let open = read("open", []);
   if (!Array.isArray(open)) open = [];
@@ -139,6 +147,13 @@
     localStorage.setItem("fa.web.sites", JSON.stringify(sites));
     localStorage.setItem("fa.web.layout", JSON.stringify(layout));
     localStorage.setItem("fa.web.open", JSON.stringify(open));
+    localStorage.setItem("fa.web.dismissed", JSON.stringify(dismissed));
+  }
+
+  function removeSite(id) {
+    sites = sites.filter(item => item.id !== id);
+    open = open.filter(item => item !== id);
+    if (!dismissed.includes(id)) dismissed.push(id);
   }
 
   function avatar(name) {
@@ -327,8 +342,7 @@
     item(t("openTab"), () => window.open(site.url, "_blank", "noopener,noreferrer"));
     item(t("deleteSite"), () => {
       if (confirm(t("confirmDelete", { name: site.name }))) {
-        sites = sites.filter(item => item.id !== site.id);
-        open = open.filter(id => id !== site.id);
+        removeSite(site.id);
         render();
       }
     });
@@ -426,8 +440,7 @@
   $("#deleteSite").addEventListener("click", () => {
     const site = sites.find(item => item.id === editingId);
     if (site && confirm(t("confirmDelete", { name: site.name }))) {
-      sites = sites.filter(item => item.id !== editingId);
-      open = open.filter(id => id !== editingId);
+      removeSite(editingId);
       $("#siteDialog").close();
       render();
     }
@@ -460,7 +473,7 @@
   document.addEventListener("keydown", event => { if (event.key === "Escape") $menuRoot.replaceChildren(); });
 
   $("#exportSites").addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify(sites.map(({ name, url, quick }) => quick ? { name, url, quick } : { name, url }), null, 2)], { type: "application/json" });
+    const blob = new Blob([JSON.stringify(sites.map(({ id, name, url, quick }) => quick ? { id, name, url, quick } : { id, name, url }), null, 2)], { type: "application/json" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "kickoff-sites.json";
@@ -478,7 +491,9 @@
       imported.forEach(item => {
         const url = validUrl(String(item.url || ""));
         const name = String(item.name || "").trim().slice(0, 40);
-        if (url && name && !sites.some(site => site.url === url)) sites.push({ id: uid(), name, url, ...(item.quick ? { quick: true } : {}) });
+        const wanted = String(item.id || "").slice(0, 60);
+        const id = wanted && !sites.some(site => site.id === wanted) ? wanted : uid();
+        if (url && name && !sites.some(site => site.url === url)) sites.push({ id, name, url, ...(item.quick ? { quick: true } : {}) });
       });
       render();
       tag($("#status"), { text: "imported" });
@@ -486,6 +501,69 @@
     event.target.value = "";
   });
 
+  // ---- Update links: sync with links.json published next to the app ----
+  const LINKS_URL = "links.json";
+  let lastLinksCheck = 0;
+  let toastTimer;
+  function toast(message) {
+    const node = $("#toast");
+    node.textContent = message;
+    node.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => node.classList.remove("show"), 4500);
+  }
+  async function updateLinks({ silent = false } = {}) {
+    const status = $("#linksStatus");
+    const trigger = $("#updateLinks");
+    if (!silent) { tag(status, { text: "linksChecking" }); trigger.disabled = true; }
+    let list;
+    try {
+      const response = await fetch(LINKS_URL + "?t=" + Date.now(), { cache: "no-store" });
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      const payload = await response.json();
+      list = Array.isArray(payload) ? payload : payload.sites;
+      if (!Array.isArray(list)) throw new Error("Expected a list of sites");
+    } catch {
+      if (!silent) tag(status, { text: "linksFailed" });
+      trigger.disabled = false;
+      return;
+    }
+    lastLinksCheck = Date.now();
+    let count = 0;
+    for (const item of list) {
+      const id = String(item?.id || "").slice(0, 60);
+      const url = validUrl(String(item?.url || ""));
+      const name = String(item?.name || "").trim().slice(0, 40);
+      if (!id || !url) continue;
+      const site = sites.find(entry => entry.id === id);
+      if (site) {
+        // Only act when the published link changed since we last applied it,
+        // so a manual edit is kept until the published list changes again.
+        if (site.linkUrl !== url) {
+          if (site.url !== url) { site.url = url; count++; }
+          site.linkUrl = url;
+        }
+      } else if (name && !dismissed.includes(id)) {
+        sites.push({ id, name, url, linkUrl: url, ...(item.quick ? { quick: true } : {}) });
+        count++;
+      }
+    }
+    trigger.disabled = false;
+    if (count) {
+      render();
+      tag(status, { text: "linksUpdated" }, { n: count });
+      toast(t("linksUpdated", { n: count }));
+    } else {
+      save();
+      tag(status, { text: "linksUpToDate" });
+    }
+  }
+  $("#updateLinks").addEventListener("click", () => updateLinks());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && Date.now() - lastLinksCheck > 30 * 60 * 1000) updateLinks({ silent: true });
+  });
+
   setLang(lang);
   render();
+  updateLinks({ silent: true });
 })();

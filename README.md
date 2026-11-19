@@ -25,6 +25,7 @@
   - [Managing sites](#managing-sites)
   - [Panel layouts](#panel-layouts)
   - [Quick access](#quick-access)
+  - [Keeping links up to date](#keeping-links-up-to-date)
   - [Backup and restore](#backup-and-restore)
   - [Language](#language)
   - [Install on iPhone](#install-on-iphone)
@@ -55,6 +56,7 @@ The mobile layout is designed and tuned for iPhone (including the iPhone 15 Pro)
 - **Full site management** — add, edit, delete, and **drag to reorder** chips.
 - **Per-panel controls** — editable address bar, reload, open in a new tab, and fullscreen.
 - **English / Türkçe toggle** — switch instantly without reloading your open panels; your choice is remembered.
+- **Update links** — when a site changes address, edit one file in your repo and every device picks up the new link automatically.
 - **Backup and restore** — export your list to JSON and import it on another device or browser.
 - **Installable** — web app manifest and Apple touch icon for a standalone, app-like experience.
 - **Mobile-first details** — stacked panels, large touch targets, safe-area aware, and a Quick access button that stays within reach.
@@ -112,6 +114,43 @@ On phones, panels always stack vertically for readability, and the layout select
 
 Quick access is a shortlist for your most-used sites. Add a site to it from its **⋮** menu or by ticking **Add to Quick access** in the add/edit dialog. The button shows how many sites it holds. On mobile it stays pinned to the bottom of the screen while you scroll.
 
+### Keeping links up to date
+
+Sites change addresses often, so KICKOFF! can sync with a link list that is published together with the app.
+
+**For the site owner — fix a link for everyone:**
+
+1. In your repository, open **`links.json`** and click the pencil (**Edit**) icon.
+2. Change the `url` of the site that moved. Keep its `id` the same.
+3. Commit the change. GitHub Pages republishes within a minute or two (browsers may cache the file for a few more minutes).
+
+```json
+{
+  "sites": [
+    { "id": "example-scores", "name": "Example Scores", "url": "https://new-address.example/" },
+    { "id": "example-live", "name": "Example Live", "url": "https://example.org/", "quick": true }
+  ]
+}
+```
+
+**For users — it just happens:**
+
+- KICKOFF! checks the list every time it opens, and again when you return to the app after 30 minutes or more. When something changed, a short message such as *Links updated: 1* appears.
+- You can also check on demand: **Settings → Update links**.
+
+**What gets updated, and what doesn't:**
+
+| Situation | Result |
+| --- | --- |
+| A listed site's `url` changed in `links.json` | Your saved site is switched to the new address. |
+| You edited a link by hand and `links.json` has not changed | Your edit is kept. |
+| `links.json` changes that site again later | The published address replaces your edit. |
+| A new `id` is added to `links.json` | The site is added to your list. |
+| You deleted a listed site | It stays deleted and is not added back. |
+| Sites you added yourself | Never touched. |
+
+Sites are matched by `id`, so never rename an `id` in `links.json`. To add a site for everyone, add a new entry with a new, unique `id`.
+
 ### Backup and restore
 
 Open **Settings** to:
@@ -123,12 +162,12 @@ The accepted format is a list of sites (or an object with a `sites` list):
 
 ```json
 [
-  { "name": "Example Scores", "url": "https://example.com/" },
-  { "name": "Example Live", "url": "https://example.org/", "quick": true }
+  { "id": "example-scores", "name": "Example Scores", "url": "https://example.com/" },
+  { "id": "example-live", "name": "Example Live", "url": "https://example.org/", "quick": true }
 ]
 ```
 
-Rules: `name` is required (up to 40 characters), `url` must be `http` or `https`, and `quick` is optional.
+Rules: `name` is required (up to 40 characters), `url` must be `http` or `https`, and `quick` and `id` are optional. Keeping the `id` keeps a site connected to the link list after you restore a backup.
 
 ### Language
 
@@ -147,7 +186,8 @@ KICKOFF! then launches full screen like a native app.
 | I want to… | Where |
 | --- | --- |
 | Change the default language | In `app.js`, change `let lang = "en";` to `"tr"`. To follow the visitor's browser instead, use `let lang = (navigator.language \|\| "").toLowerCase().startsWith("tr") ? "tr" : "en";` |
-| Change the starter site list | Edit `DEFAULT_SITES` at the top of `app.js`. It only applies to visitors who have not saved a list yet. |
+| Change a site's address for everyone | Edit `links.json` (see [Keeping links up to date](#keeping-links-up-to-date)). |
+| Change the starter site list | Edit `DEFAULT_SITES` at the top of `app.js` (and keep `links.json` in step). It only applies to visitors who have not saved a list yet. |
 | Add another language | Add a new object to `I18N` in `app.js` (copy the `en` block), then add a button with a matching `data-lang` value inside `#lang` in `index.html`. |
 | Change colors | Edit the CSS variables (`--bg`, `--panel`, `--gold`, …) at the top of `style.css`. |
 | Adjust the mobile bottom spacing | Change `--qgap` in the mobile section of `style.css`. |
@@ -161,6 +201,7 @@ kickoff/
 │   └── workflows/
 │       └── pages.yml          # GitHub Pages deployment
 ├── index.html                 # Markup, dialogs, and static translatable text
+├── links.json                 # Published link list used by "Update links"
 ├── app.js                     # App logic, translations, storage
 ├── style.css                  # Desktop and mobile styling
 ├── kickoff.webmanifest        # Installable web app manifest
@@ -174,9 +215,10 @@ kickoff/
 
 ## How it works
 
-- **State** — your sites, layout, open panels, and language are stored in `localStorage` under the keys `fa.web.sites`, `fa.web.layout`, `fa.web.open`, and `fa.web.lang`.
+- **State** — your sites, layout, open panels, and language are stored in `localStorage` under the keys `fa.web.sites`, `fa.web.layout`, `fa.web.open`, `fa.web.lang`, and `fa.web.dismissed` (sites you deleted, so link updates don't re-add them).
 - **Panels** — each panel is an `<iframe>` created on demand. Redrawing the interface (for example switching language) updates text in place, so open panels are **not** reloaded.
 - **Translations** — translatable elements carry `data-i18n-*` attributes. A small `t()` helper looks up text in the `I18N` dictionary and applies it, so adding a language needs no changes to the rendering code.
+- **Link updates** — the app fetches `links.json` from its own address (no third-party service), compares each entry with your saved site by `id`, and applies only changes that are new since the last time.
 - **Validation** — only `http` and `https` addresses are accepted, and all site text is inserted as plain text rather than HTML.
 
 ## Deployment (GitHub Pages)
@@ -208,13 +250,16 @@ Browser security isolates sites from one another, so this page cannot change ano
 **Drag-to-reorder doesn't work on my phone.**
 Reordering uses the browser's drag-and-drop, which is not supported by most touch browsers. Reorder on a desktop browser, or export, edit, and re-import your JSON file.
 
+**"Update links" says it couldn't reach the list.**
+The app needs to be served over HTTP(S) (GitHub Pages or a local server) to read `links.json`. Opening `index.html` straight from disk blocks it, and so does being offline.
+
 **My list disappeared.**
 The list is saved per browser and per address. Clearing site data, using private browsing, or opening the app from a different URL starts with a fresh list. Use **Export sites** regularly to keep a backup.
 
 ## Privacy
 
 - There is no backend, account system, analytics, or tracking.
-- Your settings and site list never leave your browser.
+- Your settings and site list never leave your browser. The link check only downloads `links.json` from the same site and sends nothing about you.
 - Panels are loaded with `referrerPolicy="no-referrer"`.
 - The page loads one web font (*Big Shoulders Display*) from Google Fonts. Everything else is local.
 - Sites you open inside panels are third-party pages with their own cookies and privacy policies.

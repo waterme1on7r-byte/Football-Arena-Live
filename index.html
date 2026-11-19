@@ -57,10 +57,12 @@
     <div class="dialog-head"><h2 data-i18n-text="settings">Settings</h2><button type="button" class="icon-btn" data-close="settingsDialog" aria-label="Close" data-i18n-aria-label="close">×</button></div>
     <div class="settings-content">
       <section><h3 data-i18n-text="siteList">Site list</h3><p data-i18n-text="siteListText">Save a backup of your Kickoff site list or add sites from a JSON file. Your list and layout are stored in this browser.</p><div class="settings-actions"><button id="exportSites" data-i18n-text="exportSites">Export sites</button><button id="importSites" data-i18n-text="importSites">Import sites</button><input id="importFile" type="file" accept="application/json" hidden></div><p id="status" role="status"></p></section>
+      <section><h3 data-i18n-text="links">Links</h3><p data-i18n-text="linksText">Sites change addresses often. Kickoff checks the link list published with this app and updates matching sites for you. Sites you added yourself are never changed.</p><div class="settings-actions"><button id="updateLinks" data-i18n-text="updateLinks">Update links</button></div><p id="linksStatus" role="status"></p></section>
       <section><h3 data-i18n-text="browserLimits">Browser limits</h3><p data-i18n-text="browserLimitsText">Some websites block being shown inside another page. Use the open-in-new-tab button on that panel if it stays blank. Browser rules also prevent this page from changing another site's video volume or reliably checking whether its links are online.</p></section>
     </div>
   </dialog>
 
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="menuRoot"></div>
   <script src="app.js"></script>
 </body>
