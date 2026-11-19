@@ -6,6 +6,11 @@
   <meta name="theme-color" content="#0b0f14">
   <meta name="color-scheme" content="dark">
   <title>KICKOFF!</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Kickoff">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" sizes="180x180" href="kickoff-touch.png">
+  <link rel="manifest" href="kickoff.webmanifest">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%230b0f14'/%3E%3Cellipse cx='24' cy='24' rx='19' ry='14' fill='none' stroke='%23f5c451' stroke-width='3'/%3E%3Cpath d='M24 10v28M5 24h38' stroke='%23e9edf2' stroke-width='1.6'/%3E%3Ccircle cx='24' cy='24' r='4.5' fill='%230b0f14' stroke='%23e9edf2' stroke-width='1.6'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,7 +45,8 @@
     <form id="siteForm">
       <div class="dialog-head"><h2 id="siteTitle">Add site</h2><button type="button" class="icon-btn" data-close="siteDialog" aria-label="Close">×</button></div>
       <label>Site name<input id="siteName" required maxlength="40" autocomplete="off" placeholder="My football site"></label>
-      <label>Website address<input id="siteUrl" required type="url" placeholder="https://example.com" autocomplete="url"></label>
+      <label>Website address<input id="siteUrl" required type="url" placeholder="https://example.com" autocomplete="url" autocapitalize="off" spellcheck="false"></label>
+      <label class="quick-toggle"><input id="siteQuick" type="checkbox"> Add to Quick access</label>
       <div class="form-actions"><button id="deleteSite" type="button" class="danger hidden">Delete</button><span></span><button type="button" data-close="siteDialog">Cancel</button><button class="primary" type="submit">Save site</button></div>
     </form>
   </dialog>
@@ -48,7 +54,7 @@
   <dialog id="settingsDialog">
     <div class="dialog-head"><h2>Settings</h2><button type="button" class="icon-btn" data-close="settingsDialog" aria-label="Close">×</button></div>
     <div class="settings-content">
-      <section><h3>Site list</h3><p>Save a backup of your Kickoff site list or add sites from a JSON file. Your list and layout are stored in this browser.</p><div class="settings-actions"><button id="exportSites">Export sites</button><button id="importSites">Import sites</button><input id="importFile" type="file" accept="application/json" hidden></div></section>
+      <section><h3>Site list</h3><p>Save a backup of your Kickoff site list or add sites from a JSON file. Your list and layout are stored in this browser.</p><div class="settings-actions"><button id="exportSites">Export sites</button><button id="importSites">Import sites</button><input id="importFile" type="file" accept="application/json" hidden></div><p id="status" role="status"></p></section>
       <section><h3>Browser limits</h3><p>Some websites block being shown inside another page. Use the open-in-new-tab button on that panel if it stays blank. Browser rules also prevent this page from changing another site's video volume or reliably checking whether its links are online.</p></section>
     </div>
   </dialog>

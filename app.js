@@ -191,7 +191,6 @@
     active.forEach(site => $stage.append(makePane(site)));
     const cols = layout || Math.ceil(Math.sqrt(active.length));
     $stage.style.gridTemplateColumns = `repeat(${Math.min(cols, active.length)},minmax(0,1fr))`;
-    $stage.style.gridAutoRows = "minmax(0,1fr)";
   }
 
   function renderLayout() {
@@ -251,9 +250,17 @@
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-label", "Quick access sites");
     panel.replaceChildren();
+    const header = document.createElement("div");
+    header.className = "quick-head";
     const heading = document.createElement("h3");
     heading.textContent = "Quick access";
-    panel.append(heading);
+    const add = button("+ Add site", "quick-add", "Add a site to Quick access", () => {
+      $("#quickBtn").setAttribute("aria-expanded", "false");
+      renderQuickPanel();
+      openAddDialog(true);
+    });
+    header.append(heading, add);
+    panel.append(header);
     const favorites = sites.filter(site => site.quick);
     if (!favorites.length) {
       const hint = document.createElement("p");
@@ -287,11 +294,12 @@
     if (!existing) document.body.append(panel);
   }
 
-  function openAddDialog() {
+  function openAddDialog(quick = false) {
     editingId = null;
     $("#siteTitle").textContent = "Add site";
     $("#siteName").value = "";
     $("#siteUrl").value = "https://";
+    $("#siteQuick").checked = quick === true;
     $("#deleteSite").classList.add("hidden");
     $("#siteDialog").showModal();
     $("#siteName").focus();
@@ -302,6 +310,7 @@
     $("#siteTitle").textContent = "Edit site";
     $("#siteName").value = site.name;
     $("#siteUrl").value = site.url;
+    $("#siteQuick").checked = Boolean(site.quick);
     $("#deleteSite").classList.remove("hidden");
     $("#siteDialog").showModal();
     $("#siteName").focus();
@@ -313,8 +322,9 @@
     const url = validUrl($("#siteUrl").value);
     if (!name || !url) return;
     const existing = sites.find(site => site.id === editingId);
-    if (existing) { existing.name = name; existing.url = url; }
-    else sites.push({ id: uid(), name, url });
+    const quick = $("#siteQuick").checked;
+    if (existing) Object.assign(existing, { name, url, quick });
+    else sites.push({ id: uid(), name, url, quick });
     $("#siteDialog").close();
     render();
   });
