@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚽ KICKOFF!
+# <img width="32" height="32" alt="favicon-32" src="https://github.com/user-attachments/assets/49c88944-2513-4db1-a8a8-99b66cf34b51" /> KICKOFF!
 
 **A multi-panel web viewer for the sites you follow — arrange up to four side by side, in English or Türkçe.**
 
